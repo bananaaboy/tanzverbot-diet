@@ -3,6 +3,7 @@ export enum Sex {
   Female = "f",
 }
 
+// TODO: Use a structured data type (e.g., array of objects) instead of parallel arrays
 const foodNames: string[] = [
   "Kellogg's Tresor",
   "Weihenstephan Haltbare Milch",
@@ -26,6 +27,7 @@ export function calcDateOnDiet(
   sex: Sex,
 ): number {
   const weightGainKg = targetWeightKg - currentWeightKg;
+  // TODO: Validation logic could be extracted or improved
   if (weightGainKg < 0) {
     throw new Error(`This diet is for gaining weight, not loosing it!`);
   }
@@ -33,6 +35,7 @@ export function calcDateOnDiet(
     throw new Error(`You do not qualify for this kind of diet.`);
   }
   let dailyCaloriesOnDiet = 0;
+  // TODO: Avoid for...in on arrays and implicit index access
   for (const index in foodNames) {
     const calories = foodCalories[index] || 0;
     const servings = foodServings[index] || 0;
@@ -41,6 +44,7 @@ export function calcDateOnDiet(
   let dailyCaloriesBasicMetabolicRate = 0;
   if (sex == Sex.Male) {
     dailyCaloriesBasicMetabolicRate = Math.ceil(
+      // TODO: Extract BMR calculation logic to separate functions or use polymorphism
       // Harris-Benedict-Formula (Male)
       66.47 + 13.7 * currentWeightKg + 5.003 * heightM * 100.0 - 6.75 * ageY,
     );
@@ -55,5 +59,6 @@ export function calcDateOnDiet(
   if (dailyExcessCalories <= 0) {
     throw new Error("This diet is not sufficient for you to gain weight.");
   }
+  // TODO: Use constants for magic numbers like 9000
   return Math.ceil((9000 * weightGainKg) / dailyExcessCalories);
 }
