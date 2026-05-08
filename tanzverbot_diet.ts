@@ -3,13 +3,13 @@ export enum Sex {
   Female = "f",
 }
 
-interface FoodItem {
+export interface FoodItem {
   name: string;
   caloriesPerServing: number;
   servingsPerDay: number;
 }
 
-const DIET_FOOD_ITEMS: FoodItem[] = [
+export const DIET_FOOD_ITEMS: FoodItem[] = [
   { name: "Kellogg's Tresor", caloriesPerServing: 137, servingsPerDay: 4 },
   { name: "Weihenstephan Haltbare Milch", caloriesPerServing: 64, servingsPerDay: 8 },
   { name: "Mühle Frikadellen", caloriesPerServing: 271, servingsPerDay: 4 },
@@ -22,6 +22,19 @@ const DIET_FOOD_ITEMS: FoodItem[] = [
   { name: "Mini Babybel", caloriesPerServing: 59, servingsPerDay: 20 },
 ];
 
+export const DIET_FOOD_ITEMS_2018: FoodItem[] = [
+  { name: "Mini Babybel", caloriesPerServing: 60, servingsPerDay: 10 },
+  { name: "Ferdi Fuchs Mini-Salami", caloriesPerServing: 55, servingsPerDay: 5 },
+  { name: "Ferdi Fuchs Mini-Würstchen", caloriesPerServing: 70, servingsPerDay: 5 },
+  { name: "Fleischsalat", caloriesPerServing: 700, servingsPerDay: 1 },
+  { name: "Milchschnitte", caloriesPerServing: 118, servingsPerDay: 10 },
+  { name: "Kinder Pinguí", caloriesPerServing: 135, servingsPerDay: 10 },
+  { name: "Cola", caloriesPerServing: 200, servingsPerDay: 2 },
+  { name: "Double Cup Burger", caloriesPerServing: 900, servingsPerDay: 1 },
+  { name: "Chicken Wings", caloriesPerServing: 450, servingsPerDay: 1 },
+  { name: "Pizzabrötchen", caloriesPerServing: 550, servingsPerDay: 1 },
+];
+
 const CALORIES_PER_KG_FAT = 9000;
 
 function calculateBMR(
@@ -32,13 +45,11 @@ function calculateBMR(
 ): number {
   if (sex === Sex.Male) {
     return Math.ceil(
-      // Harris-Benedict-Formula (Male)
-      66.47 + 13.7 * weightKg + 5.003 * (heightM * 100) - 6.75 * ageY,
+      66.47 + 13.7 * weightKg + 5.003 * (heightM * 100) - 6.75 * ageY
     );
   }
   return Math.ceil(
-    // Harris-Benedict-Formula (Female)
-    655.1 + 9.563 * weightKg + 1.85 * (heightM * 100) - 4.676 * ageY,
+    655.1 + 9.563 * weightKg + 1.85 * (heightM * 100) - 4.676 * ageY
   );
 }
 
@@ -48,18 +59,20 @@ function validateQualification(
   ageY: number,
 ): void {
   if (weightGainKg < 0) {
-    throw new Error(`This diet is for gaining weight, not loosing it!`);
+    throw new Error("This diet is for gaining weight, not loosing it!");
   }
   if (ageY < 16 || heightM < 1.5) {
-    throw new Error(`You do not qualify for this kind of diet.`);
+    throw new Error("You do not qualify for this kind of diet.");
   }
 }
 
-function calculateDailyCaloriesOnDiet(): number {
-  return DIET_FOOD_ITEMS.reduce(
-    (total, item) => total + item.caloriesPerServing * item.servingsPerDay,
-    0,
-  );
+function calculateDailyCaloriesOnDiet(diet: FoodItem[]): number {
+  let totalCalories = 0;
+  for (let i = 0; i < diet.length; i++) {
+    let item = diet[i];
+    totalCalories = totalCalories + (item.caloriesPerServing * item.servingsPerDay);
+  }
+  return totalCalories;
 }
 
 export function calcDateOnDiet(
@@ -68,24 +81,28 @@ export function calcDateOnDiet(
   heightM: number,
   ageY: number,
   sex: Sex,
+  diet: FoodItem[] = DIET_FOOD_ITEMS
 ): number {
-  const weightGainKg = targetWeightKg - currentWeightKg;
+  let weightGainKg = targetWeightKg - currentWeightKg;
 
   validateQualification(weightGainKg, heightM, ageY);
 
-  const dailyCaloriesOnDiet = calculateDailyCaloriesOnDiet();
+  let dailyCaloriesOnDiet = calculateDailyCaloriesOnDiet(diet);
 
-  const dailyCaloriesBasicMetabolicRate = calculateBMR(
-    currentWeightKg,
+  let averageWeight = (currentWeightKg + targetWeightKg) / 2;
+
+  let dailyCaloriesBasicMetabolicRate = calculateBMR(
+    averageWeight,
     heightM,
     ageY,
     sex,
   );
 
-  const dailyExcessCalories =
-    dailyCaloriesOnDiet - dailyCaloriesBasicMetabolicRate;
+  let dailyExcessCalories = dailyCaloriesOnDiet - dailyCaloriesBasicMetabolicRate;
+
   if (dailyExcessCalories <= 0) {
     throw new Error("This diet is not sufficient for you to gain weight.");
   }
+  
   return Math.ceil((CALORIES_PER_KG_FAT * weightGainKg) / dailyExcessCalories);
 }

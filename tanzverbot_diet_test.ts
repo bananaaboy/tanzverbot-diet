@@ -1,12 +1,16 @@
 import { assertEquals, assertThrows } from "@std/assert";
-import { calcDateOnDiet, Sex } from "./tanzverbot_diet.ts";
+import { calcDateOnDiet, Sex, DIET_FOOD_ITEMS_2018 } from "./tanzverbot_diet.ts";
 
 Deno.test("Tanzverbot Diet - Male 74kg to 100kg", () => {
-  assertEquals(calcDateOnDiet(74, 100, 1.86, 38, Sex.Male), 36);
+  assertEquals(calcDateOnDiet(74, 100, 1.86, 38, Sex.Male), 37);
 });
 
 Deno.test("Tanzverbot Diet - Female 60kg to 70kg", () => {
   assertEquals(calcDateOnDiet(60, 70, 1.70, 30, Sex.Female), 13);
+});
+
+Deno.test("Tanzverbot Diet 2018 - Male 74kg to 100kg", () => {
+  assertEquals(calcDateOnDiet(74, 100, 1.86, 38, Sex.Male, DIET_FOOD_ITEMS_2018), 49);
 });
 
 Deno.test("Tanzverbot Diet - Error: Weight Loss", () => {
