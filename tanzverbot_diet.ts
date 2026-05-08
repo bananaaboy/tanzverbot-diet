@@ -22,6 +22,24 @@ const DIET_FOOD_ITEMS: FoodItem[] = [
   { name: "Mini Babybel", caloriesPerServing: 59, servingsPerDay: 20 },
 ];
 
+const CALORIES_PER_KG_FAT = 9000;
+
+function calculateBMR(
+  weightKg: number,
+  heightM: number,
+  ageY: number,
+  sex: Sex,
+): number {
+  if (sex === Sex.Male) {
+    return Math.ceil(
+      66.47 + 13.7 * weightKg + 5.003 * (heightM * 100) - 6.75 * ageY,
+    );
+  }
+  return Math.ceil(
+    655.1 + 9.563 * weightKg + 1.85 * (heightM * 100) - 4.676 * ageY,
+  );
+}
+
 export function calcDateOnDiet(
   currentWeightKg: number,
   targetWeightKg: number,
@@ -43,24 +61,17 @@ export function calcDateOnDiet(
     0,
   );
 
-  let dailyCaloriesBasicMetabolicRate = 0;
-  if (sex == Sex.Male) {
-    dailyCaloriesBasicMetabolicRate = Math.ceil(
-      // TODO: Extract BMR calculation logic to separate functions or use polymorphism
-      // Harris-Benedict-Formula (Male)
-      66.47 + 13.7 * currentWeightKg + 5.003 * heightM * 100.0 - 6.75 * ageY,
-    );
-  } else {
-    dailyCaloriesBasicMetabolicRate = Math.ceil(
-      // Harris-Benedict-Formula (Female)
-      655.1 + 9.563 * currentWeightKg + 1.85 * heightM * 100.0 - 4.676 * ageY,
-    );
-  }
+  const dailyCaloriesBasicMetabolicRate = calculateBMR(
+    currentWeightKg,
+    heightM,
+    ageY,
+    sex,
+  );
+
   const dailyExcessCalories =
     dailyCaloriesOnDiet - dailyCaloriesBasicMetabolicRate;
   if (dailyExcessCalories <= 0) {
     throw new Error("This diet is not sufficient for you to gain weight.");
   }
-  // TODO: Use constants for magic numbers like 9000
-  return Math.ceil((9000 * weightGainKg) / dailyExcessCalories);
+  return Math.ceil((CALORIES_PER_KG_FAT * weightGainKg) / dailyExcessCalories);
 }
