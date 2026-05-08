@@ -3,21 +3,24 @@ export enum Sex {
   Female = "f",
 }
 
-// TODO: Use a structured data type (e.g., array of objects) instead of parallel arrays
-const foodNames: string[] = [
-  "Kellogg's Tresor",
-  "Weihenstephan Haltbare Milch",
-  "Mühle Frikadellen",
-  "Volvic Tee",
-  "Neuburger lockerer Sahnepudding",
-  "Lagnese Viennetta",
-  "Schöller 10ForTwo",
-  "Ristorante Pizza Salame",
-  "Schweppes Ginger Ale",
-  "Mini Babybel",
+interface FoodItem {
+  name: string;
+  caloriesPerServing: number;
+  servingsPerDay: number;
+}
+
+const DIET_FOOD_ITEMS: FoodItem[] = [
+  { name: "Kellogg's Tresor", caloriesPerServing: 137, servingsPerDay: 4 },
+  { name: "Weihenstephan Haltbare Milch", caloriesPerServing: 64, servingsPerDay: 8 },
+  { name: "Mühle Frikadellen", caloriesPerServing: 271, servingsPerDay: 4 },
+  { name: "Volvic Tee", caloriesPerServing: 40, servingsPerDay: 12 },
+  { name: "Neuburger lockerer Sahnepudding", caloriesPerServing: 297, servingsPerDay: 1 },
+  { name: "Lagnese Viennetta", caloriesPerServing: 125, servingsPerDay: 6 },
+  { name: "Schöller 10ForTwo", caloriesPerServing: 482, servingsPerDay: 2 },
+  { name: "Ristorante Pizza Salame", caloriesPerServing: 835, servingsPerDay: 2 },
+  { name: "Schweppes Ginger Ale", caloriesPerServing: 37, servingsPerDay: 25 },
+  { name: "Mini Babybel", caloriesPerServing: 59, servingsPerDay: 20 },
 ];
-const foodCalories: number[] = [137, 64, 271, 40, 297, 125, 482, 835, 37, 59];
-const foodServings: number[] = [4, 8, 4, 12, 1, 6, 2, 2, 25, 20];
 
 export function calcDateOnDiet(
   currentWeightKg: number,
@@ -34,13 +37,12 @@ export function calcDateOnDiet(
   if (ageY < 16 || heightM < 1.5) {
     throw new Error(`You do not qualify for this kind of diet.`);
   }
-  let dailyCaloriesOnDiet = 0;
-  // TODO: Avoid for...in on arrays and implicit index access
-  for (const index in foodNames) {
-    const calories = foodCalories[index] || 0;
-    const servings = foodServings[index] || 0;
-    dailyCaloriesOnDiet += calories * servings;
-  }
+
+  const dailyCaloriesOnDiet = DIET_FOOD_ITEMS.reduce(
+    (total, item) => total + item.caloriesPerServing * item.servingsPerDay,
+    0,
+  );
+
   let dailyCaloriesBasicMetabolicRate = 0;
   if (sex == Sex.Male) {
     dailyCaloriesBasicMetabolicRate = Math.ceil(
