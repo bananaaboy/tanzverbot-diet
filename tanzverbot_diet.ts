@@ -32,10 +32,12 @@ function calculateBMR(
 ): number {
   if (sex === Sex.Male) {
     return Math.ceil(
+      // Harris-Benedict-Formula (Male)
       66.47 + 13.7 * weightKg + 5.003 * (heightM * 100) - 6.75 * ageY,
     );
   }
   return Math.ceil(
+    // Harris-Benedict-Formula (Female)
     655.1 + 9.563 * weightKg + 1.85 * (heightM * 100) - 4.676 * ageY,
   );
 }
