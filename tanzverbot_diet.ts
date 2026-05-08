@@ -40,6 +40,26 @@ function calculateBMR(
   );
 }
 
+function validateQualification(
+  weightGainKg: number,
+  heightM: number,
+  ageY: number,
+): void {
+  if (weightGainKg < 0) {
+    throw new Error(`This diet is for gaining weight, not loosing it!`);
+  }
+  if (ageY < 16 || heightM < 1.5) {
+    throw new Error(`You do not qualify for this kind of diet.`);
+  }
+}
+
+function calculateDailyCaloriesOnDiet(): number {
+  return DIET_FOOD_ITEMS.reduce(
+    (total, item) => total + item.caloriesPerServing * item.servingsPerDay,
+    0,
+  );
+}
+
 export function calcDateOnDiet(
   currentWeightKg: number,
   targetWeightKg: number,
@@ -48,18 +68,10 @@ export function calcDateOnDiet(
   sex: Sex,
 ): number {
   const weightGainKg = targetWeightKg - currentWeightKg;
-  // TODO: Validation logic could be extracted or improved
-  if (weightGainKg < 0) {
-    throw new Error(`This diet is for gaining weight, not loosing it!`);
-  }
-  if (ageY < 16 || heightM < 1.5) {
-    throw new Error(`You do not qualify for this kind of diet.`);
-  }
 
-  const dailyCaloriesOnDiet = DIET_FOOD_ITEMS.reduce(
-    (total, item) => total + item.caloriesPerServing * item.servingsPerDay,
-    0,
-  );
+  validateQualification(weightGainKg, heightM, ageY);
+
+  const dailyCaloriesOnDiet = calculateDailyCaloriesOnDiet();
 
   const dailyCaloriesBasicMetabolicRate = calculateBMR(
     currentWeightKg,

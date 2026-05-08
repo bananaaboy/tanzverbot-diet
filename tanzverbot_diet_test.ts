@@ -1,4 +1,4 @@
-import { assertEquals } from "@std/assert";
+import { assertEquals, assertThrows } from "@std/assert";
 import { calcDateOnDiet, Sex } from "./tanzverbot_diet.ts";
 
 Deno.test("Tanzverbot Diet - Male 74kg to 100kg", () => {
@@ -6,12 +6,29 @@ Deno.test("Tanzverbot Diet - Male 74kg to 100kg", () => {
 });
 
 Deno.test("Tanzverbot Diet - Female 60kg to 70kg", () => {
-  // BMR (Female): 655.1 + (9.563 * 60) + (1.85 * 170) - (4.676 * 30)
-  // = 655.1 + 573.78 + 314.5 - 140.28 = 1403.1
-  // Math.ceil(1403.1) = 1404
-  // Diet Sum: 8410
-  // Excess: 8410 - 1404 = 7006
-  // Gain: 10 * 9000 = 90000
-  // Days: 90000 / 7006 = 12.84 -> 13
   assertEquals(calcDateOnDiet(60, 70, 1.70, 30, Sex.Female), 13);
+});
+
+Deno.test("Tanzverbot Diet - Error: Weight Loss", () => {
+  assertThrows(
+    () => calcDateOnDiet(100, 90, 1.86, 38, Sex.Male),
+    Error,
+    "This diet is for gaining weight, not loosing it!",
+  );
+});
+
+Deno.test("Tanzverbot Diet - Error: Too Young", () => {
+  assertThrows(
+    () => calcDateOnDiet(74, 100, 1.86, 15, Sex.Male),
+    Error,
+    "You do not qualify for this kind of diet.",
+  );
+});
+
+Deno.test("Tanzverbot Diet - Error: Too Short", () => {
+  assertThrows(
+    () => calcDateOnDiet(74, 100, 1.49, 38, Sex.Male),
+    Error,
+    "You do not qualify for this kind of diet.",
+  );
 });
